@@ -1,13 +1,14 @@
-package com.example.kafka.controller;
+package com.example.kafka.clients.mqtt;
 
-import com.example.kafka.model.MapBoxResponse;
-import com.example.kafka.model.TelemetryData;
-import com.example.kafka.model.Vehicle;
+import com.example.kafka.clients.mapbox.MapBoxClient;
+import com.example.kafka.controller.TelemetryDataController;
+import com.example.kafka.controller.VehicleController;
+import com.example.kafka.mappers.MapBoxMapper;
+import com.example.kafka.entity.TelemetryDataEntity;
+import com.example.kafka.entity.VehicleEntity;
 import com.google.gson.Gson;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -39,7 +40,7 @@ public class MqttBeans {
     @Autowired
     TelemetryDataController telemetryDataController;
 
-    MapBoxClientGet x = new MapBoxClientGet();
+    MapBoxClient mapBoxClient = new MapBoxClient();
 
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
@@ -87,11 +88,7 @@ public class MqttBeans {
                 case VEHICLES_CAR_2_TELE:
                 case VEHICLES_CAR_3_TELE:
                 case VEHICLES_CAR_4_TELE:
-                    try {
-                        addTelemetryData(message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    addTelemetryData(message);
                     break;
                 default:
                     System.out.println(DEFAULT);
@@ -105,27 +102,21 @@ public class MqttBeans {
     }
 
     private void addVehicle(Message message) {
-        Vehicle vehicle = (Vehicle) jsonFormat(message, Vehicle.class);
+        VehicleEntity vehicle = (VehicleEntity) jsonFormat(message, VehicleEntity.class);
         vehicle.setCode(topic(message));
-        vehicleController.add(vehicle);
+
+        if (vehicleController.getVehicleByCode(topic(message)) == null) {
+            vehicleController.add(vehicle);
+        }
+
         System.out.println(vehicle.toString());
     }
 
-    private void addTelemetryData(Message message) throws JSONException {
+    private void addTelemetryData(Message message) {
+
         System.out.println(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC).toString() + " telemetry");
-        TelemetryData telemetryData = (TelemetryData) jsonFormat(message, TelemetryData.class);
-        telemetryData.setVehicle(vehicleController.getVehicleByCode(topic(message)));
-
-        x.main(telemetryData.getLongitude(),telemetryData.getLatitude());
-
-        Gson g = new Gson();
-
-        String h = x.main(telemetryData.getLongitude(),telemetryData.getLatitude());
-        Object ppp = g.fromJson(h, Object.class);
-        JSONObject jsonObject = (JSONObject) ppp;
-
-
-        String []  name = (String []) jsonObject.get("features");
+        TelemetryDataEntity telemetryData = (TelemetryDataEntity) jsonFormat(message, TelemetryDataEntity.class);
+        mappingValuesFromMapBoxResponse(telemetryData, topic(message));
 
         if (telemetryData.getLongitude() != null) {
             telemetryDataController.add(telemetryData);
@@ -145,5 +136,24 @@ public class MqttBeans {
     private Object jsonFormat(Message message, Class classToFormat) {
         Gson g = new Gson();
         return g.fromJson(message.getPayload().toString(), classToFormat);
+    }
+
+    private TelemetryDataEntity mappingValuesFromMapBoxResponse(TelemetryDataEntity telemetryData, String topic) {
+
+        Gson g = new Gson();
+        String mapBoxClientResponse = mapBoxClient.main(telemetryData.getLongitude(), telemetryData.getLatitude());
+        MapBoxMapper mapBoxResponse = g.fromJson(mapBoxClientResponse, MapBoxMapper.class);
+
+        String street = mapBoxResponse.getFeatures().get(0).getText();
+        String houseNumber = mapBoxResponse.getFeatures().get(0).getAddress();
+        String postCode = mapBoxResponse.getFeatures().get(0).getContext().get(0).getText();
+        String city = mapBoxResponse.getFeatures().get(0).getContext().get(2).getText();
+
+        telemetryData.setVehicle(vehicleController.getVehicleByCode(topic));
+        telemetryData.setStreet(street);
+        telemetryData.setHouseNumber(houseNumber);
+        telemetryData.setPostCode(postCode);
+        telemetryData.setCity(city);
+        return telemetryData;
     }
 }

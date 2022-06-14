@@ -1,4 +1,4 @@
-package com.example.kafka.model;
+package com.example.kafka.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "vehicle")
-public class Vehicle {
+public class VehicleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

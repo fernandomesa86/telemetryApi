@@ -1,4 +1,4 @@
-package com.example.kafka.model;
+package com.example.kafka.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "telemetryData")
-public class TelemetryData {
+public class TelemetryDataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "telemetryDataId")
@@ -29,12 +29,15 @@ public class TelemetryData {
     private String sat_used;
     private String sat_inview;
     private String fuel_percent;
+    private String battery_percent;
     private String lights;
     private String engine;
     private String street;
-    private String house;
+    private String postCode;
+    private String houseNumber;
+    private String city;
 
     @ManyToOne
     @JoinColumn(name = "vehicle_vehicle_id", nullable = false, updatable = true)
-    private Vehicle vehicle;
+    private VehicleEntity vehicle;
 }

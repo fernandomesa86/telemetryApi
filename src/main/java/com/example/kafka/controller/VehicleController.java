@@ -1,8 +1,9 @@
 package com.example.kafka.controller;
 
 import java.util.List;
-import com.example.kafka.model.Vehicle;
-import com.example.kafka.service.VehicleService;
+import java.util.Optional;
+import com.example.kafka.entity.VehicleEntity;
+import com.example.kafka.services.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,24 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/vehicle")
 public class VehicleController {
 
     @Autowired
     VehicleService vehicleService;
 
-    @PostMapping("/vehicle")
-    public void add(@RequestBody Vehicle newVehicle) {
+    @PostMapping()
+    public void add(@RequestBody VehicleEntity newVehicle) {
         vehicleService.add(newVehicle);
     }
 
-    @GetMapping("/vehicle/all")
-    public List<Vehicle> getAll() {
+    @GetMapping("/all")
+    public List<VehicleEntity> getAll() {
         return vehicleService.getAll();
     }
 
-    @GetMapping("/vehicle/{code}")
-    public Vehicle getVehicleByCode(@PathVariable String code) {
+    @GetMapping("/code/{code}")
+    public VehicleEntity getVehicleByCode(@PathVariable String code) {
         return vehicleService.getVehicleByCode(code);
+    }
+
+    @GetMapping("/{vehicleId}")
+    public Optional<VehicleEntity> getVehicleByCode(@PathVariable int vehicleId) {
+        return vehicleService.getVehicleById(vehicleId);
     }
 }

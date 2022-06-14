@@ -1,4 +1,4 @@
-package com.example.kafka.controller;
+package com.example.kafka.clients.mqtt;
 
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.mqtt.support.MqttHeaders;

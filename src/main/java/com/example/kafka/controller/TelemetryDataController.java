@@ -2,8 +2,11 @@ package com.example.kafka.controller;
 
 import java.util.List;
 import java.util.Optional;
-import com.example.kafka.model.TelemetryData;
-import com.example.kafka.service.TelemetryDataService;
+import com.example.kafka.exception.VehicleNotfoundException;
+import com.example.kafka.entity.TelemetryDataEntity;
+import com.example.kafka.entity.VehicleEntity;
+import com.example.kafka.services.TelemetryDataService;
+import com.example.kafka.services.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,24 +16,37 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/telemetryData")
 public class TelemetryDataController {
 
     @Autowired
     TelemetryDataService telemetryDataService;
 
-    @PostMapping("/telemetryData")
-    public void add(@RequestBody TelemetryData newTelemetryData) {
+    @Autowired
+    VehicleService vehicleService;
+
+    @PostMapping()
+    public void add(@RequestBody TelemetryDataEntity newTelemetryData) {
         telemetryDataService.add(newTelemetryData);
     }
 
-    @GetMapping("/telemetryData/all")
-    public List<TelemetryData> getAll() {
+    @GetMapping("/all")
+    public List<TelemetryDataEntity> getAll() {
         return telemetryDataService.getAll();
     }
 
-    @GetMapping("/telemetryData/{telemetryDataById}")
-    public Optional<TelemetryData> getTelemetryDataById(@PathVariable int telemetryDataById) {
+    @GetMapping("/{telemetryDataById}")
+    public Optional<TelemetryDataEntity> getTelemetryDataById(@PathVariable int telemetryDataById) {
         return telemetryDataService.getTelemetryDataById(telemetryDataById);
+    }
+
+    @GetMapping("/vehicleCode/{vehicleCode}")
+    public TelemetryDataEntity getLastPositionByVehicleId(@PathVariable String vehicleCode) {
+        VehicleEntity vehicle = vehicleService.getVehicleByCode(vehicleCode);
+        if (vehicle == null) {
+            throw new VehicleNotfoundException();
+        }
+        List<TelemetryDataEntity> listTelemetryData = telemetryDataService.getLastPosition(vehicle.getVehicleId());
+        return listTelemetryData.get(listTelemetryData.size() - 1);
     }
 }

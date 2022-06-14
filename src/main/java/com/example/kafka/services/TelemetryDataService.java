@@ -1,8 +1,8 @@
-package com.example.kafka.service;
+package com.example.kafka.services;
 
 import java.util.List;
 import java.util.Optional;
-import com.example.kafka.model.TelemetryData;
+import com.example.kafka.entity.TelemetryDataEntity;
 import com.example.kafka.respositories.TelemetryDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,15 +14,19 @@ public class TelemetryDataService {
     @Autowired
     TelemetryDataRepository telemetryDataRepository;
 
-    public void add(@RequestBody TelemetryData newTelemetryData) {
+    public void add(@RequestBody TelemetryDataEntity newTelemetryData) {
         telemetryDataRepository.save(newTelemetryData);
     }
 
-    public List<TelemetryData> getAll() {
+    public List<TelemetryDataEntity> getAll() {
         return telemetryDataRepository.findAll();
     }
 
-    public Optional<TelemetryData> getTelemetryDataById(int telemetryDataId) {
+    public Optional<TelemetryDataEntity> getTelemetryDataById(int telemetryDataId) {
         return telemetryDataRepository.findById(telemetryDataId);
+    }
+
+    public List<TelemetryDataEntity> getLastPosition(int vehicleId) {
+        return telemetryDataRepository.getLastPosition(vehicleId);
     }
 }

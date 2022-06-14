@@ -1,8 +1,8 @@
-package com.example.kafka.service;
+package com.example.kafka.services;
 
 import java.util.List;
 import java.util.Optional;
-import com.example.kafka.model.Vehicle;
+import com.example.kafka.entity.VehicleEntity;
 import com.example.kafka.respositories.VehiclesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,19 +14,19 @@ public class VehicleService {
     @Autowired
     VehiclesRepository vehiclesRepository;
 
-    public void add(@RequestBody Vehicle newVehicle) {
+    public void add(@RequestBody VehicleEntity newVehicle) {
         vehiclesRepository.save(newVehicle);
     }
 
-    public List<Vehicle> getAll() {
+    public List<VehicleEntity> getAll() {
         return vehiclesRepository.findAll();
     }
 
-    public Optional<Vehicle> getVehicleById(int vehicleId) {
+    public Optional<VehicleEntity> getVehicleById(int vehicleId) {
         return vehiclesRepository.findById(vehicleId);
     }
 
-    public Vehicle getVehicleByCode(String code) {
+    public VehicleEntity getVehicleByCode(String code) {
         return vehiclesRepository.getVehicleByCode(code);
     }
 }
