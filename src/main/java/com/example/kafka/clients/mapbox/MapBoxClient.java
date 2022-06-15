@@ -6,7 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 public class MapBoxClient {
 
-    public String main(String longitude, String latitude) {
+    public String getGeoLocation(String longitude, String latitude) {
         String result = null;
 
         try {

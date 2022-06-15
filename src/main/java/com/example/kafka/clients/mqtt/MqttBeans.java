@@ -141,7 +141,7 @@ public class MqttBeans {
     private TelemetryDataEntity mappingValuesFromMapBoxResponse(TelemetryDataEntity telemetryData, String topic) {
 
         Gson g = new Gson();
-        String mapBoxClientResponse = mapBoxClient.main(telemetryData.getLongitude(), telemetryData.getLatitude());
+        String mapBoxClientResponse = mapBoxClient.getGeoLocation(telemetryData.getLongitude(), telemetryData.getLatitude());
         MapBoxMapper mapBoxResponse = g.fromJson(mapBoxClientResponse, MapBoxMapper.class);
 
         String street = mapBoxResponse.getFeatures().get(0).getText();
