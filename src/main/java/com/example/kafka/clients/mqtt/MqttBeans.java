@@ -39,8 +39,8 @@ public class MqttBeans {
     VehicleController vehicleController;
     @Autowired
     TelemetryDataController telemetryDataController;
-
-    MapBoxClient mapBoxClient = new MapBoxClient();
+    @Autowired
+    MapBoxClient mapBoxClient;
 
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
@@ -138,7 +138,7 @@ public class MqttBeans {
         return g.fromJson(message.getPayload().toString(), classToFormat);
     }
 
-    private TelemetryDataEntity mappingValuesFromMapBoxResponse(TelemetryDataEntity telemetryData, String topic) {
+    public TelemetryDataEntity mappingValuesFromMapBoxResponse(TelemetryDataEntity telemetryData, String topic) {
 
         Gson g = new Gson();
         String mapBoxClientResponse = mapBoxClient.getGeoLocation(telemetryData.getLongitude(), telemetryData.getLatitude());

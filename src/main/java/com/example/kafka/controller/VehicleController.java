@@ -35,7 +35,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{vehicleId}")
-    public Optional<VehicleEntity> getVehicleByCode(@PathVariable int vehicleId) {
+    public Optional<VehicleEntity> getVehicleById(@PathVariable int vehicleId) {
         return vehicleService.getVehicleById(vehicleId);
     }
 }
